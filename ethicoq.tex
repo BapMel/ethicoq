@@ -1,0 +1,1063 @@
+\documentclass[12pt]{report}
+\usepackage[utf8x]{inputenc}
+
+%Warning: tipa declares many non-standard macros used by utf8x to
+%interpret utf8 characters but extra packages might have to be added
+%(e.g. "textgreek" for Greek letters not already in tipa).
+%Use coqdoc's option -p to add new packages.
+\usepackage{tipa}
+
+\usepackage[T1]{fontenc}
+\usepackage{fullpage}
+\usepackage{coqdoc}
+\usepackage{amsmath,amssymb}
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This file has been automatically generated with the command
+%% coqdoc --latex ethicoq.v --utf8 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\coqlibrary{ethicoq}{Library }{ethicoq}
+
+\begin{coqdoccode}
+\end{coqdoccode}
+\section{Spinoza: Ethica}
+
+
+
+ Ethicoq permet de : 
+
+
+
+\begin{itemize}
+\item  vérifier si les démonstrations de Spinoza sont correctes ;
+
+
+
+\item  voir les détours inutiles qu'il réalise, les hypothèses inutiles qu'il
+  introduit ;
+
+
+
+\item  corriger ses démonstrations en écrivant noir sur blanc les axiomes
+  implicites que l'historien de la philosophie admet aussi implicitement
+  que l'auteur,
+
+\end{itemize}
+et ce plus méthodiquement encore que Gueroult, grâce à la rigueur
+de Coq. 
+
+
+Ce système permet également d'expérimenter les changements
+d'interprétation, en regardant par exemple si les démonstrations restent
+correctes lorsque l'on change le codage d'une des définitions. 
+
+
+On peut enfin démontrer et vérifier de nouveaux théorèmes spinozistes,
+absents de l'Éthique.
+
+
+Nous espérons ainsi montrer une nouvelle fois, après Gueroult et
+Vuillemin, l'apport des sciences formelles à l'histoire structurale de
+la philosophie.
+
+
+
+
+ D'abord un peu de logique. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{de\_morgan\_disj}:\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{P} \coqdocvar{Q}: \coqdockw{Prop},\coqdoceol
+\coqdocindent{2.00em}
+\~{}(\coqdocvar{P} \ensuremath{\lor} \coqdocvar{Q}) \ensuremath{\rightarrow} \ensuremath{\lnot}\coqdocvar{P} \ensuremath{\land} \ensuremath{\lnot}\coqdocvar{Q}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{P} \coqdocvar{Q} \coqdocvar{npq}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{split}; \coqdoctac{intros} \coqdocvar{p}; \coqdoctac{destruct} \coqdocvar{npq}; [\coqdoctac{left} \ensuremath{|} \coqdoctac{right}]; \coqdoctac{exact} \coqdocvar{p}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\par
+\noindent\hrulefill\par
+\noindent{}  
+
+\subsection{Pars 1: De Deo}
+
+\begin{coqdoccode}
+\coqdocnoindent
+\coqdockw{Module} \coqdocvar{Pars1}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\subsubsection{Definitiones}
+
+
+
+ Nous aurons besoin d'une notion très générale d'\coqdocvar{aliquid}
+  (« quelque chose »). Ceci comprendra les substances, attributs et
+  modes. C'est le domaine sur lequel on quantifiera. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{aliquid}: \coqdockw{Set}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Pour l'instant, nous ne poserons pas le tiers exclu tant qu'il
+  n'est pas nécessaire. Par défaut, la logique utilisée est donc
+  intuitionniste. 
+
+\par
+\noindent\hrulefill\par
+\noindent{}  
+
+\paragraph{Definitio 1}
+
+ « Per causam sui intelligo id cujus essentia involvit existentiam
+  sive id cujus natura non potest concipi nisi existens. » 
+
+ Il nous faut les prédicats unaires suivants. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{causa\_sui}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{ejus\_essentia\_involvit\_existentiam}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{ejus\_natura\_potest\_concipi\_nisi\_existens}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Comme l'indique le \coqdocvar{potest} ci-dessus, la logique modale est
+  embarquée dans les noms de prédicats, jusqu'à nouvel ordre. Si Spinoza
+  a vraiment besoin de raisonnements modaux, nous utiliserons une
+  logique modale. 
+
+ Définition 1 (1d1) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_definitio1}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{causa\_sui} \coqdocvar{a} \coqdoceol
+\coqdocindent{3.50em}
+\ensuremath{\rightarrow} \coqdocvar{ejus\_essentia\_involvit\_existentiam} \coqdocvar{a} \coqdoceol
+\coqdocindent{5.00em}
+\ensuremath{\land} \ensuremath{\lnot}\coqdocvar{ejus\_natura\_potest\_concipi\_nisi\_existens} \coqdocvar{a}) \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\land} \coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{ejus\_essentia\_involvit\_existentiam} \coqdocvar{a} \coqdoceol
+\coqdocindent{3.50em}
+\ensuremath{\lor} \ensuremath{\lnot}\coqdocvar{ejus\_natura\_potest\_concipi\_nisi\_existens} \coqdocvar{a} \coqdoceol
+\coqdocindent{3.50em}
+\ensuremath{\rightarrow} \coqdocvar{causa\_sui} \coqdocvar{a}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Definitio 2}
+
+ « Ea res dicitur in suo genere finita quæ alia ejusdem naturæ
+  terminari potest. Exempli gratia corpus dicitur finitum quia aliud
+  semper majus concipimus. Sic cogitatio alia cogitatione terminatur. At
+  corpus non terminatur cogitatione nec cogitatio corpore. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{terminari\_potest}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{suo\_genere\_finita}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Définition 2 (1d2) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_definitio2}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a1}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{suo\_genere\_finita} \coqdocvar{a1} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\leftrightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\~{}(\coqdoctac{\ensuremath{\exists}} \coqdocvar{a2}: \coqdocvar{aliquid}, \coqdocvar{terminari\_potest} \coqdocvar{a1} \coqdocvar{a2}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Definitio 3}
+
+
+
+ « Per substantiam intelligo id quod in se est et per se concipitur
+  hoc est id cujus conceptus non indiget conceptu alterius rei a quo
+  formari debeat. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{substantia}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Nous avons besoin de plusieurs nouveaux prédicats unaires ou
+  binaires. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{existit}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{existit\_in}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{existit\_in\_se}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{existit\_in\_alio}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{concipi}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{concipi\_per}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{concipi\_per\_se}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{concipi\_per\_aliud}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Les définitions suivantes sont celles d'exister ou d'être conçu
+  par soi ou par autre chose. Si Spinoza ne pose pas explicitement ces
+  définitions, c'est parce qu'elles sont prises en charge par la langue
+  qu'il utilise, à savoir le latin. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{existit\_in\_se\_definitio}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdocvar{existit\_in\_se} \coqdocvar{a} \ensuremath{\leftrightarrow} \coqdocvar{existit\_in} \coqdocvar{a} \coqdocvar{a}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{existit\_in\_alio\_definitio}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a1}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{existit\_in\_alio} \coqdocvar{a1} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\leftrightarrow} \coqdoctac{\ensuremath{\exists}} \coqdocvar{a2}: \coqdocvar{aliquid}, (\coqdocvar{a1} \ensuremath{\not=} \coqdocvar{a2} \ensuremath{\land} \coqdocvar{existit\_in} \coqdocvar{a1} \coqdocvar{a2}).\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{concipi\_per\_se\_definitio}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdocvar{concipi\_per\_se} \coqdocvar{a} \ensuremath{\leftrightarrow} \coqdocvar{concipi\_per} \coqdocvar{a} \coqdocvar{a}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{concipi\_per\_aliud\_definitio}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a1}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{concipi\_per\_aliud} \coqdocvar{a1} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\leftrightarrow} \coqdoctac{\ensuremath{\exists}} \coqdocvar{a2}: \coqdocvar{aliquid}, (\coqdocvar{a1} \ensuremath{\not=} \coqdocvar{a2} \ensuremath{\land} \coqdocvar{concipi\_per} \coqdocvar{a1} \coqdocvar{a2}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+ Définition 3 (1d3) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_definitio3}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{substantia} \coqdocvar{a} \ensuremath{\leftrightarrow} \coqdocvar{existit\_in\_se} \coqdocvar{a}) \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\land} (\coqdocvar{substantia} \coqdocvar{a} \ensuremath{\leftrightarrow} \coqdocvar{concipi\_per\_se} \coqdocvar{a}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Definitio 4}
+
+
+
+ « Per attributum intelligo id quod intellectus de substantia
+  percipit tanquam ejusdem essentiam constituens. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{attributum}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{attributum\_substantiæ}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{cogitat}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{cognoscit}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Définition 4 (1d4) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_definitio4}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{c} \coqdocvar{s}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{cogitat} \coqdocvar{c} \ensuremath{\rightarrow} \coqdocvar{substantia} \coqdocvar{s} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{cognoscit} \coqdocvar{c} \coqdocvar{s} \coqdoceol
+\coqdocindent{3.50em}
+\ensuremath{\leftrightarrow} \coqdoctac{\ensuremath{\exists}} \coqdocvar{a}: \coqdocvar{aliquid}, (\coqdocvar{attributum\_substantiæ} \coqdocvar{a} \coqdocvar{s} \ensuremath{\land} \coqdocvar{cognoscit} \coqdocvar{c} \coqdocvar{a})).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Definitio 5}
+
+ « Per modum intelligo substantiæ affectiones sive id quod in alio
+  est, per quod etiam concipitur. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{modum}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{modum\_substantiæ}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\coqdocemptyline
+\coqdocemptyline
+\end{coqdoccode}
+Définition 5 (1d5) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_definitio5}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{m} \coqdocvar{s}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{modum\_substantiæ} \coqdocvar{m} \coqdocvar{s} \coqdoceol
+\coqdocindent{3.50em}
+\ensuremath{\leftrightarrow} \coqdoceol
+\coqdocindent{3.50em}
+\coqdocvar{modum} \coqdocvar{m} \ensuremath{\land} \coqdocvar{substantia} \coqdocvar{s} \ensuremath{\land} \coqdocvar{existit\_in} \coqdocvar{m} \coqdocvar{s})\coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\land}\coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{modum\_substantiæ} \coqdocvar{m} \coqdocvar{s} \ensuremath{\rightarrow} \coqdocvar{concipi\_per} \coqdocvar{m} \coqdocvar{s})\coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\land}\coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{modum} \coqdocvar{m} \ensuremath{\leftrightarrow} \coqdocvar{existit\_in\_alio} \coqdocvar{m}).\coqdoceol
+\coqdocemptyline
+\coqdocemptyline
+\coqdocemptyline
+\coqdocemptyline
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Definitio 6}
+
+ « Per Deum intelligo ens absolute infinitum hoc est substantiam
+  constantem infinitis attributis quorum unumquodque æternam et
+  infinitam essentiam exprimit. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{absolute\_infinitum}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{infinitis\_attributis}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{est\_deus}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Définition 6 (1d6) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_definitio6}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{est\_deus} \coqdocvar{a} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\leftrightarrow} \coqdocvar{absolute\_infinitum} \coqdocvar{a} \ensuremath{\land} \coqdocvar{infinitis\_attributis} \coqdocvar{a}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Definitio 7}
+
+ « Ea res libera dicitur quæ ex sola suæ naturæ necessitate existit
+  et a se sola ad agendum determinatur. Necessaria autem vel potius
+  coacta quæ ab alio determinatur ad existendum et operandum certa ac
+  determinata ratione. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{liber}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{ex\_sola\_suæ\_naturæ\_necessitate\_existit}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{a\_se\_sola\_ad\_agendum\_determinatur}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{coactus}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Définition 7 (1d7) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_definitio7}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{liber} \coqdocvar{a} \ensuremath{\rightarrow}\coqdoceol
+\coqdocindent{3.50em}
+\coqdocvar{ex\_sola\_suæ\_naturæ\_necessitate\_existit} \coqdocvar{a} \ensuremath{\land}\coqdoceol
+\coqdocindent{3.50em}
+\coqdocvar{a\_se\_sola\_ad\_agendum\_determinatur} \coqdocvar{a}) \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\land}\coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{ex\_sola\_suæ\_naturæ\_necessitate\_existit} \coqdocvar{a} \ensuremath{\lor}\coqdoceol
+\coqdocindent{3.50em}
+\coqdocvar{a\_se\_sola\_ad\_agendum\_determinatur} \coqdocvar{a}\coqdoceol
+\coqdocindent{3.50em}
+\ensuremath{\rightarrow} \coqdocvar{liber} \coqdocvar{a}) \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\land}\coqdoceol
+\coqdocindent{3.00em}
+(\coqdocvar{coactus} \coqdocvar{a} \ensuremath{\leftrightarrow} \ensuremath{\lnot}\coqdocvar{liber} \coqdocvar{a}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Definitio 8}
+
+ « Per æternitatem intelligo ipsam existentiam quatenus ex sola rei
+  æternæ definitione necessario sequi concipitur. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{æternis}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Définition 8 (1d8) 
+
+ À remplir ! 
+
+\par
+\noindent\hrulefill\par
+\noindent{}  
+
+\subsubsection{Axiomata}
+
+
+
+\paragraph{Axioma 1}
+
+ « Omnia quæ sunt vel in se vel in alio sunt. » 
+
+ Axiome 1 (1a1) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_axioma1}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{existit} \coqdocvar{a} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{existit\_in\_se} \coqdocvar{a} \ensuremath{\lor} \coqdocvar{existit\_in\_alio} \coqdocvar{a}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Cet axiome pourrait-il être démontré ? Il faudrait pour cela poser
+  l'axiome « tout ce qui existe existe dans quelque chose ». Ensuite on
+  pourrait dire que cette chose est soit la même, soit une autre (par le
+  tiers exclu). On en conclurait que tout ce qui existe existe en soi ou
+  en autre chose. 
+
+\paragraph{Axioma 2}
+
+ « Id quod per aliud non potest concipi, per se concipi debet. » 
+
+ Axiome 2 (1a2) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_axioma2}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\lnot}\coqdocvar{concipi\_per\_aliud} \coqdocvar{a} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{concipi\_per\_se} \coqdocvar{a}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Soulignons le sens de l'implication, qui n'est pas formulée comme
+  une équivalence. On ne sait pas si ce qui doit se concevoir par soi ne
+  peut être conçu par autre chose. Pourtant, c'est précisément de cette
+  réciproque que nous aurons besoin pour démontrer la proposition 2 de
+  la première partie. 
+
+\paragraph{Axioma 3}
+
+ « Ex data causa determinata necessario sequitur effectus et contra
+  si nulla detur determinata causa, impossibile est ut effectus
+  sequatur. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{causa\_determinata}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{effectus}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{sequitur}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Axiome 3 (1a3) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_axioma3}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a1}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{causa\_determinata} \coqdocvar{a1} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\leftrightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdoctac{\ensuremath{\exists}} \coqdocvar{a2}, (\coqdocvar{effectus} \coqdocvar{a2} \ensuremath{\land} \coqdocvar{sequitur} \coqdocvar{a1} \coqdocvar{a2}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Axioma 4}
+
+ « Effectus cognitio a cognitione causæ dependet et eandem
+  involvit. » 
+
+ Axiome 4 (1a4) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_axioma4}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{c} \coqdocvar{e}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{sequitur} \coqdocvar{c} \coqdocvar{e} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{concipi\_per} \coqdocvar{e} \coqdocvar{c} \ensuremath{\land} \coqdocvar{concipi\_per} \coqdocvar{c} \coqdocvar{e}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+J'interprète ainsi cet axiome comme « on connaît la cause si et
+  seulement si on connaît l'effet. » 
+
+\paragraph{Axioma 5}
+
+ « Quæ nihil commune cum se invicem habent, etiam per se invicem
+  intelligi non possunt sive conceptus unius alterius conceptum non
+  involvit. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{habet\_aliquid\_commune\_cum}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Axiome 5 (1a5) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_axioma5}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a1} \coqdocvar{a2}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\lnot}\coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{a1} \coqdocvar{a2} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\lnot}\coqdocvar{concipi\_per} \coqdocvar{a1} \coqdocvar{a2}.\coqdoceol
+\coqdocemptyline
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Axioma 6}
+
+ « Idea vera debet cum suo ideato convenire. » 
+
+ Axiome 6 (1a6) 
+
+ À faire ! Je regarderai comment Spinoza l'utilise pour savoir
+  comment le formuler. 
+
+\paragraph{Axioma 7}
+
+ « Quicquid ut non existens potest concipi, ejus essentia non
+  involvit existentiam. » 
+
+ Axiome 7 (1a7) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Pars1\_axioma7}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{ejus\_natura\_potest\_concipi\_nisi\_existens} \coqdocvar{a} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\lnot}\coqdocvar{ejus\_essentia\_involvit\_existentiam} \coqdocvar{a}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\par
+\noindent\hrulefill\par
+\noindent{}  
+
+\subsubsection{Propositiones}
+
+
+
+\paragraph{Propositio 1}
+
+ « Substantia prior est natura suis affectionibus. » 
+
+ Dès la première proposition, Spinoza enrichit son vocabulaire. Il
+  faut donc définir ce qu'est l'antériorité. Pour cela, je m'appuie sur
+  deux prédicats existants : « exister dans » et « être conçu par ». 
+
+
+  Je définis seulement l'antériorité par une implication. J'avais
+  d'abord mis une équivalence, mais Jean-Pascal Anfray m'a dit le 2 juin
+  2015 que c'était déjà peut-être trop s'engager métaphysiquement que de
+  dire que ce qui est postérieur en nature à quelque chose existe en
+  elle ou est conçu par elle. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Variable} \coqdocvar{prior}: \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdocvar{aliquid} \ensuremath{\rightarrow} \coqdockw{Prop}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{existit\_in\_prior}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a1} \coqdocvar{a2}: \coqdocvar{aliquid}, \coqdocvar{existit\_in} \coqdocvar{a2} \coqdocvar{a1} \ensuremath{\rightarrow} \coqdocvar{prior} \coqdocvar{a1} \coqdocvar{a2}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{concipi\_per\_prior}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a1} \coqdocvar{a2}: \coqdocvar{aliquid}, \coqdocvar{concipi\_per} \coqdocvar{a2} \coqdocvar{a1} \ensuremath{\rightarrow} \coqdocvar{prior} \coqdocvar{a1} \coqdocvar{a2}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Proposition 1 (1p1) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Theorem} \coqdocvar{Pars1\_propositio1}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} (\coqdocvar{s} \coqdocvar{m}: \coqdocvar{aliquid}), \coqdocvar{modum\_substantiæ} \coqdocvar{m} \coqdocvar{s} \ensuremath{\rightarrow} \coqdocvar{prior} \coqdocvar{s} \coqdocvar{m}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Proof}.\coqdoceol
+\end{coqdoccode}
+« Demonstratio. Patet ex definitione 3 et 5. » 
+
+ Supposons une substance \coqdocvar{s} et un mode \coqdocvar{m} qui lui appartient
+    (\coqdocvar{ms}). \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{intros} \coqdocvar{s} \coqdocvar{m} \coqdocvar{ms}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Nous montrerons l'antériorité à partir de l'existence en autre
+    chose. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{existit\_in\_prior}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Et c'est ici qu'intervient la définition 5 annoncée par Spinoza.
+    Elle énonce en effet que le mode existe dans une substance. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Pars1\_definitio5}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+La démonstration est alors terminée. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{exact} \coqdocvar{ms}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Contrairement à ce qu'annonce Spinoza, on n'a pas besoin de la
+  définition 3. Il suffit de savoir que le mode dépend de la substance,
+  et on n'a pas besoin de savoir que la substance ne dépend de rien.
+  Même Gueroult croit que la définition 3 est vraiment utile
+  (Gueroult 1968, p. 111) : « étant en soi et conçue par soi, la
+  substance ne suppose rien avant elle, contrairement aux modes, qui lui
+  sont postérieurs, puisqu'ils ne peuvent qu'être en elle et conçus par
+  elle ». \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Propositio 2}
+
+ « Duæ substantiæ diversa attributa habentes nihil inter se commune
+  habent. » 
+
+ Voici la réciproque de l'axiome 2, sans laquelle la proposition
+  n'est pas démontrable : ce qui se conçoit par soi ne se conçoit pas
+  par autre chose. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Addendum\_Pars1\_axioma2\_reciproce}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{concipi\_per\_se} \coqdocvar{a} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\lnot}\coqdocvar{concipi\_per\_aliud} \coqdocvar{a}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Il faut aussi préciser que deux choses ont quelque chose en commun
+  si et seulement si elles se conçoivent l'une par l'autre. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Addendum\_concipi\_per\_aliquid\_commune}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a} \coqdocvar{b}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{a} \coqdocvar{b} \coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\leftrightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{concipi\_per} \coqdocvar{a} \coqdocvar{b}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Proposition 2 (1p2) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Theorem} \coqdocvar{Pars1\_propositio2}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{s1} \coqdocvar{s2}: \coqdocvar{aliquid},\coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{substantia} \coqdocvar{s1} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{substantia} \coqdocvar{s2} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{s1} \ensuremath{\not=} \coqdocvar{s2} \ensuremath{\rightarrow}\coqdoceol
+\coqdocindent{3.00em}
+(\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{4.50em}
+\coqdocvar{attributum\_substantiæ} \coqdocvar{a} \coqdocvar{s1} \ensuremath{\rightarrow} \ensuremath{\lnot}\coqdocvar{attributum\_substantiæ} \coqdocvar{a} \coqdocvar{s2}) \ensuremath{\rightarrow}\coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\lnot}\coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{s1} \coqdocvar{s2}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Proof}.\coqdoceol
+\end{coqdoccode}
+« Demonstratio. Patet etiam ex definitione 3. Unaquæque enim in
+    se debet esse et per se debet concipi sive conceptus unius conceptum
+    alterius non involvit. » 
+
+ Supposons deux substances différentes (\coqdocvar{s1} et \coqdocvar{s2}) qui n'ont
+    aucun attribut en commun (\coqdocvar{attr}) mais qui auraient quand même
+    quelque chose en commun (\coqdocvar{habet}). \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{intros} \coqdocvar{s1} \coqdocvar{s2} \coqdocvar{S1} \coqdocvar{S2} \coqdocvar{diff} \coqdocvar{attr} \coqdocvar{habet}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Nous allons parvenir à une contradiction en soutenant à la fois
+    qu'une substance se conçoit par autre chose et qu'elle n'est pas
+    conçue par autre chose. (Note : sur l'usage des démonstrations par
+    l'absurde chez Spinoza, cf. Gueroult 1968, p. 39.) \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdocvar{absurd} (\coqdocvar{concipi\_per\_aliud} \coqdocvar{s1}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Montrons d'abord qu'une substance ne se conçoit pas par autre
+    chose. Pour cela, il faut utiliser la réciproque de l'axiome 2 ainsi
+    que la définition 3 ; seule cette dernière est explicitement
+    utilisée par Spinoza. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Addendum\_Pars1\_axioma2\_reciproce}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Pars1\_definitio3}. \coqdoctac{exact} \coqdocvar{S1}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Montrons maintenant que la substance est conçue par autre chose,
+    puisqu'elle est supposée avoir quelque chose en commun avec une
+    autre. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{concipi\_per\_aliud\_definitio}. \coqdoctac{\ensuremath{\exists}} \coqdocvar{s2}. \coqdoctac{split}. \coqdoctac{exact} \coqdocvar{diff}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Addendum\_concipi\_per\_aliquid\_commune}. \coqdoctac{exact} \coqdocvar{habet}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Surprise : l'hypothèse ici nommée \coqdocvar{attr} n'est pas utilisée dans
+  la démonstration. Gueroult l'a finement observé : « On doit remarquer
+  que les attributs différents, par lesquel se distinguent les
+  substances, s'ils sont mentionnés dans l'énoncé de la Proposition,
+  sont laissés de côté dans la démonstration. Celle-ci se développe
+  comme s'il s'agissait simplement d'établir que « deux substances
+  différentes n'ont rien de commun entre elles ». » (Gueroult 1968,
+  p.\~{}113). \begin{coqdoccode}
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Propositio 3}
+
+ « Quæ res nihil commune inter se habent, earum una alterius causa
+  esse non potest. » 
+
+ Proposition 3 (1p3) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Theorem} \coqdocvar{Pars1\_propositio3}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a} \coqdocvar{b}: \coqdocvar{aliquid}, \ensuremath{\lnot}\coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{a} \coqdocvar{b} \ensuremath{\rightarrow} \ensuremath{\lnot}\coqdocvar{sequitur} \coqdocvar{a} \coqdocvar{b}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Proof}.\coqdoceol
+\end{coqdoccode}
+« Demonstratio. Si nihil commune cum se invicem habent, ergo
+    (per axioma 5) nec per se invicem possunt intelligi adeoque (per
+    axioma 4) una alterius causa esse non potest. Q.E.D. » 
+
+ Supposons deux choses a et b qui n'ont rien de commun
+    (\coqdocvar{nhabet}), mais dont la seconde suit pourtant de la première
+    (\coqdocvar{seq}). \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{intros} \coqdocvar{a} \coqdocvar{b} \coqdocvar{nhabet} \coqdocvar{seq}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Nous allons montrer une contradiction : on peut démontrer à la
+    fois que \coqdocvar{a} se conçoit par \coqdocvar{b} et qu'il ne se conçoit pas par \coqdocvar{b}.
+    \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdocvar{absurd} (\coqdocvar{concipi\_per} \coqdocvar{a} \coqdocvar{b}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Montrons d'abord que \coqdocvar{a} ne se conçoit pas par \coqdocvar{b}. Cela résulte
+    de l'axiome 5, effectivement cité par Spinoza : si, comme on l'a
+    supposé, les deux choses n'ont rien de commun, alors elles ne se
+    conçoivent pas d'une par l'autre. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Pars1\_axioma5}. \coqdoctac{exact} \coqdocvar{nhabet}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Montrons pourtant que \coqdocvar{a} se conçoit par \coqdocvar{b}, puisque \coqdocvar{b} suit
+    de \coqdocvar{a}. C'est ce que permet de conclure l'axiome 4, cité par
+    Spinoza. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Pars1\_axioma4}. \coqdoctac{exact} \coqdocvar{seq}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Il n'est donc pas possible d'avoir deux choses dont l'une suive
+    de la première sans rien avoir en commun avec elle. \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+\paragraph{Propositio 4}
+
+ « Duæ aut plures res distinctæ vel inter se distinguuntur ex
+  diversitate attributorum substantiarum vel ex diversitate earundem
+  affectionum. » \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Hypothesis} \coqdocvar{Addendum\_habet\_attributum\_aut\_modum\_commune}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{s1} \coqdocvar{s2}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{substantia} \coqdocvar{s1} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{substantia} \coqdocvar{s2} \ensuremath{\rightarrow}\coqdoceol
+\coqdocindent{3.00em}
+((\coqdoctac{\ensuremath{\exists}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{4.50em}
+\coqdocvar{attributum\_substantiæ} \coqdocvar{a} \coqdocvar{s1} \ensuremath{\land} \coqdocvar{attributum\_substantiæ} \coqdocvar{a} \coqdocvar{s2}) \coqdoceol
+\coqdocindent{4.50em}
+\ensuremath{\rightarrow} \coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{s1} \coqdocvar{s2}) \ensuremath{\land}\coqdoceol
+\coqdocindent{3.00em}
+((\coqdoctac{\ensuremath{\exists}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{4.50em}
+\coqdocvar{modum\_substantiæ} \coqdocvar{a} \coqdocvar{s1} \ensuremath{\land} \coqdocvar{modum\_substantiæ} \coqdocvar{a} \coqdocvar{s2}) \coqdoceol
+\coqdocindent{4.50em}
+\ensuremath{\rightarrow} \coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{s1} \coqdocvar{s2}).\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Montrons que tout ce qui est est soit une substance soit un mode
+    (Gueroult 1968, p. 57). Spinoza le fait dans sa démonstration de la
+    proposition 4, mais extrayons cette partie de la démonstration car
+    elle peut resservir ailleurs. Cet énoncé peut surprendre en raison
+    de l'absence des attributs, mais en réalité « l'attribut est
+    substance », la différence entre les deux notions n'étant que de
+    raison (Gueroult 1968, p. 48). \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Lemma} \coqdocvar{omnis\_est\_substantia\_aut\_modum}: \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{existit} \coqdocvar{a} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{substantia} \coqdocvar{a} \ensuremath{\lor} \coqdocvar{modum} \coqdocvar{a}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Proof}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Soit \coqdocvar{a} une chose qui existe. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{intros} \coqdocvar{a} \coqdocvar{existit\_a}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Nous savons par l'axiome 1, cité par Spinoza, que tout ce qui
+    existe est en soi ou en autre chose. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{Pars1\_axioma1} \coqdockw{with} (\coqdocvar{a} := \coqdocvar{a}) \coqdoceol
+\coqdocindent{3.00em}
+\coqdockw{as} [\coqdocvar{a\_existit\_in\_se} \ensuremath{|} \coqdocvar{a\_existit\_in\_alio}].\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{exact} \coqdocvar{existit\_a}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Or si quelque chose existe en soi, alors c'est une substance, en
+    vertu de la définition 3, citée par Spinoza. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+- \coqdoctac{left}.\coqdoceol
+\coqdocindent{3.00em}
+\coqdoctac{destruct} \coqdocvar{Pars1\_definitio3} \coqdockw{with} (\coqdocvar{a} := \coqdocvar{a}) \coqdoceol
+\coqdocindent{4.00em}
+\coqdockw{as} [\coqdocvar{substantia\_existit} \coqdocvar{substantia\_concipi}].\coqdoceol
+\coqdocindent{3.00em}
+\coqdoctac{apply} \coqdocvar{substantia\_existit}. \coqdoctac{exact} \coqdocvar{a\_existit\_in\_se}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Et si quelque chose existe en autre chose, alors c'est un mode,
+    en vertu de la définition 5, citée par Spinoza. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+- \coqdoctac{right}.\coqdoceol
+\coqdocindent{3.00em}
+\coqdoctac{apply} \coqdocvar{Pars1\_definitio5}. \coqdoctac{apply} \coqdocvar{a}. \coqdoctac{exact} \coqdocvar{a\_existit\_in\_alio}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+La démonstration par Spinoza de cette première étape de la
+  proposition 3 est donc correcte. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Proposition 4 (1p4) \begin{coqdoccode}
+\coqdocindent{1.00em}
+\coqdockw{Theorem} \coqdocvar{Pars1\_propositio4}:\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{\ensuremath{\forall}} \coqdocvar{s1} \coqdocvar{s2}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{substantia} \coqdocvar{s1} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{substantia} \coqdocvar{s2} \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdocvar{s1} \ensuremath{\not=} \coqdocvar{s2} \ensuremath{\rightarrow}\coqdoceol
+\coqdocindent{3.00em}
+\~{}(\coqdoctac{\ensuremath{\exists}} \coqdocvar{a}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{5.00em}
+\coqdocvar{attributum\_substantiæ} \coqdocvar{a} \coqdocvar{s1} \ensuremath{\land} \coqdocvar{attributum\_substantiæ} \coqdocvar{a} \coqdocvar{s2})\coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{\land}\coqdoceol
+\coqdocindent{3.00em}
+\~{}(\coqdoctac{\ensuremath{\exists}} \coqdocvar{m}: \coqdocvar{aliquid}, \coqdoceol
+\coqdocindent{5.00em}
+\coqdocvar{modum\_substantiæ} \coqdocvar{m} \coqdocvar{s1} \ensuremath{\land} \coqdocvar{modum\_substantiæ} \coqdocvar{m} \coqdocvar{s2}).\coqdoceol
+\coqdocemptyline
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdockw{Proof}.\coqdoceol
+\end{coqdoccode}
+« Omnia quæ sunt vel in se vel in alio sunt (per axioma 1) hoc
+    est (per definitiones 3 et 5) extra intellectum nihil datur præter
+    substantias earumque affectiones. Nihil ergo extra intellectum datur
+    per quod plures res distingui inter se possunt præter substantias
+    sive quod idem est (per definitionem 4) earum attributa earumque
+    affectiones. Q.E.D. » 
+
+ Supposons deux substances \coqdocvar{s1} et \coqdocvar{s2} qui sont différentes
+    l'une de l'autre (\coqdocvar{diff}). \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{intros} \coqdocvar{s1} \coqdocvar{s2} \coqdocvar{S1} \coqdocvar{S2} \coqdocvar{diff}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Rappelons que deux substances différentes n'ont rien en commun.
+    Cette démonstration est redondante avec une partie de celle de la
+    proposition 2 ; il faudrait les factoriser. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{assert} (\coqdocvar{non\_habent\_aliquid\_commune}: \ensuremath{\lnot}\coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{s1} \coqdocvar{s2}).\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{intros} \coqdocvar{nhabet}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdocvar{absurd} (\coqdocvar{concipi\_per\_aliud} \coqdocvar{s1}).\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Addendum\_Pars1\_axioma2\_reciproce}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Pars1\_definitio3}. \coqdoctac{exact} \coqdocvar{S1}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{concipi\_per\_aliud\_definitio}. \coqdoctac{\ensuremath{\exists}} \coqdocvar{s2}. \coqdoctac{split}. \coqdoctac{exact} \coqdocvar{diff}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{Addendum\_concipi\_per\_aliquid\_commune}. \coqdoctac{exact} \coqdocvar{nhabet}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Montrons maintenant qu'il est impossible que deux substances
+    aient un attribut ou un mode commun, car chacune des deux options,
+    \coqdocvar{habent\_attributum\_commune} et \coqdocvar{habent\_modum\_commune}, mène à une
+    contradiction. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{de\_morgan\_disj}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{intros} \coqdocvar{habent}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{habent} \coqdockw{as} [\coqdocvar{habent\_attributum\_commune} \ensuremath{|} \coqdocvar{habent\_modum\_commune}].\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Première option : supposons qu'elles aient en commun un
+    attribut \coqdocvar{a}. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{Addendum\_habet\_attributum\_aut\_modum\_commune} \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{with} (\coqdocvar{s1} := \coqdocvar{s1}) (\coqdocvar{s2} := \coqdocvar{s2})\coqdoceol
+\coqdocindent{3.00em}
+\coqdockw{as} [\coqdocvar{attributum\_est\_aliquid\_commune} \coqdoceol
+\coqdocindent{6.00em}
+\coqdocvar{modum\_est\_aliquid\_commune}].\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{exact} \coqdocvar{S1}. \coqdoctac{exact} \coqdocvar{S2}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{habent\_attributum\_commune} \coqdoceol
+\coqdocindent{3.00em}
+\coqdockw{as} [\coqdocvar{a} \coqdocvar{est\_attributum\_commune}].\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Alors elles ont quelque chose en commun. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{assert} (\coqdocvar{habent\_aliquid\_commune}: \coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{s1} \coqdocvar{s2}).\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{attributum\_est\_aliquid\_commune}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{\ensuremath{\exists}} \coqdocvar{a}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{est\_attributum\_commune}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Mais c'est contradictoire avec ce qu'on a établi précédemment.
+    \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{non\_habent\_aliquid\_commune}. \coqdoctac{exact} \coqdocvar{habent\_aliquid\_commune}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Seconde option : ce qu'elles ont en commun est un mode, qu'on
+    appellera \coqdocvar{a}. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{Addendum\_habet\_attributum\_aut\_modum\_commune} \coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{with} (\coqdocvar{s1} := \coqdocvar{s1}) (\coqdocvar{s2} := \coqdocvar{s2})\coqdoceol
+\coqdocindent{3.00em}
+\coqdockw{as} [\coqdocvar{attributum\_est\_aliquid\_commune} \coqdoceol
+\coqdocindent{6.00em}
+\coqdocvar{modum\_est\_aliquid\_commune}].\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{exact} \coqdocvar{S1}. \coqdoctac{exact} \coqdocvar{S2}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{habent\_modum\_commune} \coqdoceol
+\coqdocindent{3.00em}
+\coqdockw{as} [\coqdocvar{a} \coqdocvar{est\_modum\_commune}].\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Alors elles ont quelque chose en commun. \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{assert} (\coqdocvar{habent\_aliquid\_commune}: \coqdocvar{habet\_aliquid\_commune\_cum} \coqdocvar{s1} \coqdocvar{s2}).\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{modum\_est\_aliquid\_commune}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{\ensuremath{\exists}} \coqdocvar{a}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{apply} \coqdocvar{est\_modum\_commune}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Mais c'est contradictoire avec ce qu'on a établi précédemment.
+    \begin{coqdoccode}
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{non\_habent\_aliquid\_commune}. \coqdoctac{exact} \coqdocvar{habent\_aliquid\_commune}.\coqdoceol
+\coqdocemptyline
+\end{coqdoccode}
+Étrangement, la démonstration suivie ici suit une voie très
+  différente de celle de Spinoza. On n'a pas besoin d'affirmer que toute
+  chose est substance ou mode. En fait, le seul axiome dont on ait
+  vraiment besoin est un axiome implicite assez faible : « avoir un
+  attribut ou un mode commun, c'est avoir quelque chose de commun ». \begin{coqdoccode}
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{End} \coqdocvar{Pars1}.\coqdoceol
+\end{coqdoccode}
+\end{document}
